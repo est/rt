@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+<body>
+<script>
+async function connect() {
+  const pc = new RTCPeerConnection({
+    iceServers: [{ urls: "stun:stun.cloudflare.com:3478" }]
+  });
+
+  const dc = pc.createDataChannel("chat");
+  dc.onopen = () => console.log("channel open");
+  dc.onmessage = e => console.log("got:", e.data);
+
+  const offer = await pc.createOffer();
+  await pc.setLocalDescription(offer);
+
+  // send offer to Worker
+  const res = await fetch("/", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ sdp: offer.sdp }),
+  });
+  const { sdp: answer } = await res.json();
+
+  await pc.setRemoteDescription({ type: "answer", sdp: answer });
+}
+
+connect();
+</script>
+</body>
+</html>
