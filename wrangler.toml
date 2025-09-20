@@ -1,0 +1,6 @@
+name = "rt"
+main = "src/index.js"
+compatibility_flags = ["nodejs_compat"]
+compatibility_date = "2025-01-01"
+[assets]
+directory = "./dist"
